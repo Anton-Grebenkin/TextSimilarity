@@ -9,12 +9,17 @@ namespace TextSimilarity.API.UnitTests.Features.Account.Register
     {
         private Mock<IRegisterRepository> _registerRepositoryMock;
         private Mock<IPasswordService> _passwordService;
+        private Mock<IJWTService> _jwtServiceMock;
+        private RegisterInteractor _interactor;
 
         [SetUp]
         public void Setup()
         {
             _registerRepositoryMock = new();
             _passwordService = new();
+            _jwtServiceMock = new();
+
+            _interactor = new RegisterInteractor(_registerRepositoryMock.Object, _passwordService.Object, _jwtServiceMock.Object);
         }
 
         [Test]
@@ -28,10 +33,9 @@ namespace TextSimilarity.API.UnitTests.Features.Account.Register
                 .ReturnsAsync(true);
 
             var registerRequest = new RegisterRequest("Login", "Password");
-            var interactor = new RegisterInteractor(_registerRepositoryMock.Object, _passwordService.Object);
 
             //Act
-            var result = await interactor.Handle(registerRequest, default);
+            var result = await _interactor.Handle(registerRequest, default);
 
             //Assert
             result.IsFailed.Should().BeTrue();
@@ -40,7 +44,7 @@ namespace TextSimilarity.API.UnitTests.Features.Account.Register
         }
 
         [Test]
-        public async Task Handle_Should_ReturnSuccessResult_WhenUserDoesNotExists()
+        public async Task Handle_Should_ReturnSuccessResultWithToken_WhenUserDoesNotExists()
         {
             //Arrange
             _registerRepositoryMock.Setup(
@@ -49,14 +53,19 @@ namespace TextSimilarity.API.UnitTests.Features.Account.Register
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
 
+            var token = "Token";
+            _jwtServiceMock.Setup(
+                x => x.GenerateToken(It.IsAny<long>()))
+                .Returns(token);
+
             var registerRequest = new RegisterRequest("Login", "Password");
-            var interactor = new RegisterInteractor(_registerRepositoryMock.Object, _passwordService.Object);
 
             //Act
-            var result = await interactor.Handle(registerRequest, default);
+            var result = await _interactor.Handle(registerRequest, default);
 
             //Assert
             result.IsSuccess.Should().BeTrue();
+            result.Value.AuthToken.Should().Be(token);
         }
 
         [Test]
@@ -76,10 +85,8 @@ namespace TextSimilarity.API.UnitTests.Features.Account.Register
                 x => x.HashPasswordAsync(registerRequest.Password))
                 .ReturnsAsync(passwordHash);
 
-            var interactor = new RegisterInteractor(_registerRepositoryMock.Object, _passwordService.Object);
-
             //Act
-            var result = await interactor.Handle(registerRequest, default);
+            var result = await _interactor.Handle(registerRequest, default);
 
             //Assert
             _registerRepositoryMock.Verify(
@@ -100,10 +107,9 @@ namespace TextSimilarity.API.UnitTests.Features.Account.Register
                 .ReturnsAsync(false);
 
             var registerRequest = new RegisterRequest("Login", "Password");
-            var interactor = new RegisterInteractor(_registerRepositoryMock.Object, _passwordService.Object);
 
             //Act
-            var result = await interactor.Handle(registerRequest, default);
+            var result = await _interactor.Handle(registerRequest, default);
 
             //Assert
             _passwordService.Verify(

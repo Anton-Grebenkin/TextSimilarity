@@ -11,14 +11,14 @@ namespace TextSimilarity.API.Features.Account
     public class AccountController : APIControllerBase
     {
         [HttpPost("Login")]
-        public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
+        public async Task<ActionResult<LoginResponse>> Login(LoginRequest request, CancellationToken cancellationToken)
         {
-            var result = await Mediator.Send(request);
+            var result = await Mediator.Send(request, cancellationToken);
             return result.ToActionResult();
         }
 
         [HttpPost("Register")]
-        public async Task<ActionResult> Register(RegisterRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult<RegisterResponse>> Register(RegisterRequest request, CancellationToken cancellationToken)
         {
             var result = await Mediator.Send(request, cancellationToken);
             return result.ToActionResult();

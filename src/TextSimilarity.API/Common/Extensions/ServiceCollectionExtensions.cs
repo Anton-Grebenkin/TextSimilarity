@@ -39,6 +39,7 @@ namespace TextSimilarity.API.Common.Extensions
 
         internal static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
+            services.AddScoped<IPasswordService, PasswordService>();
             services.AddScoped<IRevokeAPIKeyRepository, RevokeAPIKeyRepository>();
             services.AddScoped<IGenerateAPIKeyRepository, GenerateAPIKeyRepository>();
             services.AddScoped<IAPIKeyRepository, APIKeyRepository>();

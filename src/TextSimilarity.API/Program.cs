@@ -10,6 +10,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 AspNetCoreResult.Setup(config => config.DefaultProfile = new ResultEndpointProfile());
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder
+            .AllowAnyMethod()
+             .AllowAnyHeader()
+             .SetIsOriginAllowed(origin => true)
+             .AllowCredentials();
+        });
+});
 builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection(nameof(JWTSettings)));
 builder.Services.AddDbContext<AppDataContext>(c => c.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddApplicationServices();
@@ -71,6 +83,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
