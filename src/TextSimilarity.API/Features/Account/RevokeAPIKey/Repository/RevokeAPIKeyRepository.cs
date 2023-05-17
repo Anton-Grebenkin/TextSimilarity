@@ -27,7 +27,7 @@ namespace TextSimilarity.API.Features.Account.RevokeAPIKey.Repository
 
             apiKeyEntity.IsActive = false;
 
-            //_db.APIKeys.Update(apiKeyEntity);
+             _db.APIKeys.Update(apiKeyEntity);
             await _db.SaveChangesAsync(cancellationToken);
         }
     }

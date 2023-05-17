@@ -3,6 +3,7 @@ using MediatR;
 using FluentResults;
 using TextSimilarity.API.Features.TextSimilatity.GetTextSimilarity.UseCase;
 using FluentValidation.Results;
+using TextSimilarity.API.Common.ResultSettings;
 
 namespace TextSimilarity.API.Common.PipelineBehaviours
 {
@@ -53,7 +54,8 @@ namespace TextSimilarity.API.Common.PipelineBehaviours
 
         private Result ValidationFailuresToFailResult (IEnumerable<ValidationFailure> failures)
         {
-            return Result.Fail(failures.Select(f => new Error(f.ErrorMessage)));
+            var errors = failures.Select(f => new ValidationError(f.PropertyName.ToLower(), f.ErrorMessage));
+            return Result.Fail(errors);
         }
 
     }

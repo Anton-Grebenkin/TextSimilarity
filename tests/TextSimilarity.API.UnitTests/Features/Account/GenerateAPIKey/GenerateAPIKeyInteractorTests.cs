@@ -124,7 +124,7 @@ namespace TextSimilarity.API.UnitTests.Features.Account.GenerateAPIKey
             _generateAPIKeyRepositoryMock.Verify(
                 x => x.AddAPIKeyAsync(
                     It.Is<long>(v => v == user.UserId), 
-                    It.IsAny<string>(), 
+                    It.Is<string>(s => !string.IsNullOrEmpty(s)), 
                     It.IsAny<CancellationToken>()),
                 Times.Once );
         }

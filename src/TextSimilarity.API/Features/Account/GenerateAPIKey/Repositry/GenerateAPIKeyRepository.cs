@@ -22,7 +22,7 @@ namespace TextSimilarity.API.Features.Account.GenerateAPIKey.Repository
             return _db.APIKeys.Where(a => a.UserId == userId && a.IsActive).AnyAsync(cancellationToken);
         }
 
-        public Task AddAPIKeyAsync(long userId, string apiKey, CancellationToken cancellationToken = default)
+        public async Task AddAPIKeyAsync(long userId, string apiKey, CancellationToken cancellationToken = default)
         {
             var apiKeyEntity = new APIKey
             {
@@ -31,10 +31,8 @@ namespace TextSimilarity.API.Features.Account.GenerateAPIKey.Repository
                 IsActive = true
             };
 
-            _db.APIKeys.AddAsync(apiKeyEntity, cancellationToken);
-            _db.SaveChangesAsync(cancellationToken);
-
-            return Task.CompletedTask;
+            await _db.APIKeys.AddAsync(apiKeyEntity, cancellationToken);
+            await _db.SaveChangesAsync(cancellationToken);
         }
     }
 }

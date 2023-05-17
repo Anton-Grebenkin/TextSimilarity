@@ -10,6 +10,7 @@ using TextSimilarity.API.Common.Security.Authorization;
 using TextSimilarity.API.Features.Account.Login.Repository;
 using TextSimilarity.API.Features.Account.GenerateAPIKey.Repository;
 using TextSimilarity.API.Features.Account.RevokeAPIKey.Repository;
+using TextSimilarity.API.Features.Account.GetAPIKey.Repository;
 
 namespace TextSimilarity.API.Common.Extensions
 {
@@ -49,6 +50,7 @@ namespace TextSimilarity.API.Common.Extensions
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<ILoginRepository, LoginRepository>();
             services.AddScoped<IRegisterRepository, RegisterRepository>();
+            services.AddScoped<IGetAPIKeyRepository, GetAPIKeyRepository>();
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             services.AddMediatR(cfg => {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());

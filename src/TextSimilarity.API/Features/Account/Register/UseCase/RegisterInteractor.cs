@@ -20,7 +20,7 @@ namespace TextSimilarity.API.Features.Account.Register.UseCase
                 .NotEmpty().WithMessage($"{nameof(RegisterRequest.Password)} cannot be empty");
         }
     }
-    public record RegisterResponse(string AuthToken);
+    public record RegisterResponse(string AuthToken, string Login);
     public class RegisterInteractor : IRequestHandler<RegisterRequest, Result<RegisterResponse>>
     {
         private readonly IRegisterRepository _registerRepository;
@@ -46,7 +46,7 @@ namespace TextSimilarity.API.Features.Account.Register.UseCase
 
             var token = _jwtService.GenerateToken(user.Id);
 
-            return Result.Ok(new RegisterResponse(token));
+            return Result.Ok(new RegisterResponse(token, user.Login));
         }
     }
 }

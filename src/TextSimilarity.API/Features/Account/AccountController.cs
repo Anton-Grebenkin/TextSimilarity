@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TextSimilarity.API.Common.Abstractions;
 using TextSimilarity.API.Features.Account.GenerateAPIKey.UseCase;
+using TextSimilarity.API.Features.Account.GetAPIKey.UseCase;
 using TextSimilarity.API.Features.Account.Login.UseCase;
 using TextSimilarity.API.Features.Account.Register.UseCase;
 using TextSimilarity.API.Features.Account.RevokeAPIKey.UseCase;
@@ -35,6 +36,13 @@ namespace TextSimilarity.API.Features.Account
         public async Task<ActionResult> RevokeAPIKey()
         {
             var result = await Mediator.Send(new RevokeAPIKeyRequest());
+            return result.ToActionResult();
+        }
+
+        [HttpGet("GetAPIKey")]
+        public async Task<ActionResult> GetAPIKey()
+        {
+            var result = await Mediator.Send(new GetAPIKeyRequest());
             return result.ToActionResult();
         }
     }

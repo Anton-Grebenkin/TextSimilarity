@@ -44,6 +44,19 @@ namespace TextSimilarity.API.Common.Security.Authentication
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_settings.Secret);
+
+            LifetimeValidator lifetimeValidator = (DateTime? notBefore, DateTime? expires, SecurityToken securityToken, TokenValidationParameters validationParameters) =>
+            {
+                if (expires != null && notBefore != null)
+                {
+                    if (DateTime.UtcNow < expires.Value.ToUniversalTime() & DateTime.UtcNow > notBefore.Value.ToUniversalTime())
+                    {
+                        return true; // Still valid
+                    }
+                }
+                return false; // Expired
+            };
+
             try
             {
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
@@ -52,6 +65,8 @@ namespace TextSimilarity.API.Common.Security.Authentication
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false,
+                    ValidateLifetime = true,
+                    LifetimeValidator = lifetimeValidator,
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
 
@@ -60,10 +75,11 @@ namespace TextSimilarity.API.Common.Security.Authentication
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
                 return false;
             }
         }
+
     }
 }
