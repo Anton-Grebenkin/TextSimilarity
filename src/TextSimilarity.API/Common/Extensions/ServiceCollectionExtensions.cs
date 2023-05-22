@@ -11,24 +11,14 @@ using TextSimilarity.API.Features.Account.Login.Repository;
 using TextSimilarity.API.Features.Account.GenerateAPIKey.Repository;
 using TextSimilarity.API.Features.Account.RevokeAPIKey.Repository;
 using TextSimilarity.API.Features.Account.GetAPIKey.Repository;
+using TextSimilarity.API.Features.Account.GetAPIHistory.Repository;
+using TextSimilarity.API.Common.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace TextSimilarity.API.Common.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        //internal static void AddApplicationModules(this IServiceCollection services)
-        //{
-        //    var modules = typeof(IApplicationModule).Assembly
-        //        .GetTypes()
-        //        .Where(p => p.IsClass && p.IsAssignableTo(typeof(IApplicationModule)))
-        //        .Select(Activator.CreateInstance)
-        //        .Cast<IApplicationModule>();
-
-        //    foreach (var module in modules)
-        //    {
-        //        module.AddModule(services);
-        //    }
-        //}
 
         internal static void AddMappingConfiguration(this IServiceCollection services)
         {
@@ -38,8 +28,11 @@ namespace TextSimilarity.API.Common.Extensions
             services.AddScoped<IMapper, ServiceMapper>();
         }
 
-        internal static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        internal static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<JWTSettings>(configuration.GetSection(nameof(JWTSettings)));
+            services.AddDbContext<AppDataContext>(c => c.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped<IAppDataContextProvider>(x => new AppDataContextProvider(configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IPasswordService, PasswordService>();
             services.AddScoped<IRevokeAPIKeyRepository, RevokeAPIKeyRepository>();
             services.AddScoped<IGenerateAPIKeyRepository, GenerateAPIKeyRepository>();
@@ -51,6 +44,7 @@ namespace TextSimilarity.API.Common.Extensions
             services.AddScoped<ILoginRepository, LoginRepository>();
             services.AddScoped<IRegisterRepository, RegisterRepository>();
             services.AddScoped<IGetAPIKeyRepository, GetAPIKeyRepository>();
+            services.AddScoped<IGetAPIHistoryRepository, GetAPIHistoryRepository>();
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             services.AddMediatR(cfg => {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());

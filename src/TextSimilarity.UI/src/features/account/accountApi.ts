@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { IAuthRequest, IAuthResponse, IGetAPIKeyResponse } from './types';
+import { IAuthRequest, IAuthResponse, IGetAPIHistoryResponse, IGetAPIKeyResponse } from './types';
 import { baseQueryWithAuth } from '../../common/utils/baseQuery';
+import { ColumnSort } from '@tanstack/table-core';
 
 
 export const ACCOUNT_API_REDUCER_KEY = 'accountApi';
@@ -54,6 +55,18 @@ export const accountApi = createApi({
       },
       invalidatesTags: ['APIKey']
     }),
+    getAPIHistory: builder.query<IGetAPIHistoryResponse, {start: number, size: number, sort: string}>({
+      query: (arg) => {
+        const { start, size, sort } = arg;
+        console.log(sort)
+        return ({
+          url: '/GetAPIHistory',
+          method: 'POST',
+          params: {start, size},
+          body: sort
+        })
+      },
+    }),
   }),
 });
 
@@ -63,7 +76,8 @@ export const {
   useLoginMutation,
   useGetAPIKeyQuery,
   useGenerateAPIKeyMutation,
-  useRevokeAPIKeyMutation
+  useRevokeAPIKeyMutation,
+  useGetAPIHistoryQuery
 } = accountApi;
 
 

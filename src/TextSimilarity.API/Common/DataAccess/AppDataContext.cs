@@ -14,6 +14,8 @@ namespace TextSimilarity.API.Common.DataAccess
 
         public DbSet<APIKey> APIKeys { get; set; }
 
+        public DbSet<RequestResponseLog> RequestResponseLogs { get; set; }
+
 
         private void Init()
         {

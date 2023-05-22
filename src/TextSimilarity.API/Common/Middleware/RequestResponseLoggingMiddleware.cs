@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.IO;
+﻿using Microsoft.IO;
 using System.Diagnostics;
 using System.Text;
-using TextSimilarity.API.Common.Abstractions;
 using TextSimilarity.API.Common.DataAccess;
 using TextSimilarity.API.Common.DataAccess.Entities;
 using TextSimilarity.API.Common.Security.Authorization;
@@ -61,14 +59,9 @@ namespace TextSimilarity.API.Common.Middleware
                 Response = response,
                 ResponseCode = context.Response.StatusCode
             });
-            try
-            {
-                await dbContext.SaveChangesAsync();
-            }
-            catch(Exception ex)
-            {
-                var a = 1;
-            }
+
+            await dbContext.SaveChangesAsync();
+          
             await dbContext.SaveChangesAsync();
 
             await context.Response.Body.CopyToAsync(originalBodyStream);

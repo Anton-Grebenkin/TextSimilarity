@@ -1,12 +1,24 @@
+
+import { useMemo, useState } from "react";
 import ErrorPage from "../../../common/components/ErrorPage";
 import FullScreenLoader from "../../../common/components/FullScreenLoader";
-import { useAppDispatch, useAppSelector } from "../../../common/store";
+import { useAppSelector } from "../../../common/store";
 import { isApiError } from "../../../common/utils/apiErrorHelper";
-import { useGenerateAPIKeyMutation, useGetAPIKeyQuery, useRevokeAPIKeyMutation } from "../accountApi";
+import MaterialReactTable, { MRT_PaginationState, type MRT_ColumnDef, MRT_SortingState } from 'material-react-table';
+import { useGenerateAPIKeyMutation, useGetAPIHistoryQuery, useGetAPIKeyQuery, useRevokeAPIKeyMutation } from "../accountApi";
+import { IHistotyItem } from "../types";
+import { format } from 'date-fns'
+
 
 export default function DashboarPage() {
   const { username } = useAppSelector(state => state.authReducer);
+  const [pagination, setPagination] = useState<MRT_PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [sorting, setSorting] = useState<MRT_SortingState>([]);
   const { data: apiKeyResponse, isLoading: getAPIKeyIsLoading, isSuccess: getAPIKeyIsSuccess, error: getAPIKeyError, isError: getAPIKeyIsError } = useGetAPIKeyQuery();
+  const { data: apiHistoryResponse, isLoading: getAPIHistoryIsLoading, isFetching: getAPIHistoryIsFetching, isSuccess: getAPIHistoryIsSuccess, error: getAPIHistoryError, isError: getAPIHistoryIsError } = useGetAPIHistoryQuery({ start: pagination.pageIndex * pagination.pageSize, size: pagination.pageSize, sort: JSON.stringify(sorting ?? []) });
   const [generateAPIKey, { isLoading: generateAPIKeyIsLoading, isSuccess: generateAPIKeyIsSuccess, error: generateAPIKeyError, isError: generateAPIKeyIsError }] = useGenerateAPIKeyMutation();
   const [revokeAPIKey, { isLoading: revokeAPIKeyIsLoading, isSuccess: revokeAPIKeyIsSuccess, error: revokeAPIKeyError, isError: revokeAPIKeyIsError }] = useRevokeAPIKeyMutation();
   const showGenerateAPIKeyButton = () => {
@@ -22,6 +34,33 @@ export default function DashboarPage() {
     await revokeAPIKey();
   }
 
+  const columns = useMemo<MRT_ColumnDef<IHistotyItem>[]>(
+    () => [
+      {
+        accessorKey: 'requestDate', //access nested data with dot notation
+        header: 'requestDate',
+        Cell: ({ cell }) => format(new Date(cell.getValue<Date>()), 'dd.MM.yyyy HH:mm:ss')
+      },
+      {
+        accessorKey: 'duration',
+        header: 'duration',
+      },
+      {
+        accessorKey: 'request', //normal accessorKey
+        header: 'request',
+      },
+      {
+        accessorKey: 'response',
+        header: 'response',
+      },
+      {
+        accessorKey: 'responseCode',
+        header: 'responseCode',
+      },
+    ],
+    [],
+  );
+
   if (getAPIKeyIsLoading || generateAPIKeyIsLoading || revokeAPIKeyIsLoading) {
     return <FullScreenLoader />
   }
@@ -31,7 +70,6 @@ export default function DashboarPage() {
     (revokeAPIKeyIsError && !isApiError(revokeAPIKeyError))) {
     return <ErrorPage />
   }
-
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -52,6 +90,23 @@ export default function DashboarPage() {
               Revoke API key
             </button>
           }
+        </div>
+        <div>
+          <p className="text-lg mt-4 mb-4 md:text-left text-center">Your API history:</p>
+          <MaterialReactTable
+            columns={columns}
+            data={apiHistoryResponse?.items && getAPIHistoryIsSuccess ? apiHistoryResponse?.items : []}
+            manualPagination
+            onPaginationChange={setPagination}
+            onSortingChange={setSorting}
+            rowCount={apiHistoryResponse?.rowCount}
+            state={{
+              pagination,
+              sorting,
+              isLoading: getAPIHistoryIsLoading,
+              showProgressBars: getAPIHistoryIsFetching
+            }}
+          />
         </div>
       </div>
     </div>

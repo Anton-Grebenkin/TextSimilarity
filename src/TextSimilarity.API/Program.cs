@@ -1,7 +1,4 @@
-using TextSimilarity.API.Common.DataAccess;
 using TextSimilarity.API.Common.Extensions;
-using Microsoft.EntityFrameworkCore;
-using TextSimilarity.API.Common.Security.Authentication;
 using Microsoft.OpenApi.Models;
 using FluentResults.Extensions.AspNetCore;
 using TextSimilarity.API.Common.ResultSettings;
@@ -22,10 +19,10 @@ builder.Services.AddCors(options =>
              .AllowCredentials();
         });
 });
-builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection(nameof(JWTSettings)));
-builder.Services.AddDbContext<AppDataContext>(c => c.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddApplicationServices();
+
+builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddMappingConfiguration();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -89,6 +86,8 @@ app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 
 app.UseAuthenticationMiddleware();
+
+app.UseRequestResponseLoggingMiddleware();
 
 app.MapControllers();
 
