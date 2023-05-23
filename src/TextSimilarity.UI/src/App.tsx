@@ -5,6 +5,7 @@ import ProtectedRoute from "./common/components/ProtectedRoute";
 import RegisterPage from "./features/account/auth/RegisterPage";
 import LoginPage from "./features/account/auth/LoginPage";
 import DashboardPage from "./features/account/dashboard/DashboardPage";
+import ErrorPage from "./common/components/ErrorPage";
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/sign-in" element={<ProtectedRoute onlyPublic><LoginPage /></ProtectedRoute>}></Route>
         <Route path="/sign-up" element={<ProtectedRoute onlyPublic><RegisterPage /></ProtectedRoute>}></Route>
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage/></ProtectedRoute>}></Route>
+        <Route path="/error" element={<ErrorPage/>}></Route>
       </Routes>
     </div>
   );

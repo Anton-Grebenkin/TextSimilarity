@@ -41,6 +41,10 @@ export default function LoginPage() {
       navigate(to)
     }
 
+    if (isError && !isApiError(error)){
+      navigate('/error')
+    }
+
   }, [isLoading]);
 
   return (
@@ -74,7 +78,7 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {isError && <span className='text-red-400'>{(isApiError(error) && error.data.message) || 'Network error'}</span>}
+          {isError && <span className='text-red-400'>{(isApiError(error) && error.data.message)}</span>}
         </form>
         <p className="mt-10 text-center text-sm text-gray-500">
           Not a member?{' '}

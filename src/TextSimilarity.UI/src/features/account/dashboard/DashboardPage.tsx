@@ -8,6 +8,7 @@ import MaterialReactTable, { MRT_PaginationState, type MRT_ColumnDef, MRT_Sortin
 import { useGenerateAPIKeyMutation, useGetAPIHistoryQuery, useGetAPIKeyQuery, useRevokeAPIKeyMutation } from "../accountApi";
 import { IHistotyItem } from "../types";
 import { format } from 'date-fns'
+import { Navigate } from "react-router";
 
 
 export default function DashboarPage() {
@@ -68,7 +69,7 @@ export default function DashboarPage() {
   if ((getAPIKeyIsError && !isApiError(getAPIKeyError)) ||
     (generateAPIKeyIsError && !isApiError(generateAPIKeyError)) ||
     (revokeAPIKeyIsError && !isApiError(revokeAPIKeyError))) {
-    return <ErrorPage />
+    return <Navigate to='/error' />
   }
 
   return (
