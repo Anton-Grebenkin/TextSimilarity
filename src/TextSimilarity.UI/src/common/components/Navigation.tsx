@@ -8,6 +8,7 @@ export default function Navigation() {
     const [navbar, setNavbar] = useState(false);
     const location = useLocation();
     const { isAuthenticated } = useAppSelector(state => state.authReducer)
+    const documentationUrl = `${process.env.REACT_APP_BASE_URL}swagger/index.html`;
     const logoutHandler = (event: React.MouseEvent) => {
         event.preventDefault()
         dispatch(authSlice.actions.logout())
@@ -32,6 +33,7 @@ export default function Navigation() {
                                 <Link to="/dashboard" state={{from: location}} className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
                                     Dashboard
                                 </Link>
+                                <a href={documentationUrl} className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Documentation</a>
                                 <a href="#" onClick={logoutHandler} className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
                                     Sign Out
                                 </a>

@@ -3,7 +3,7 @@ import { authSlice } from "../../features/account/auth/slice"
 import { RootState } from "../store"
 
 export const baseQuery = fetchBaseQuery({
-     baseUrl: `${process.env.REACT_APP_BASE_URL}Account/`,
+     baseUrl: `${process.env.REACT_APP_BASE_URL}Api/Account/`,
      prepareHeaders: (headers, { getState }) => {
         const token = (getState() as RootState).authReducer.token
         if (token) {

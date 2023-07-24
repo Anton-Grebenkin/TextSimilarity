@@ -2,6 +2,7 @@ using TextSimilarity.API.Common.Extensions;
 using Microsoft.OpenApi.Models;
 using FluentResults.Extensions.AspNetCore;
 using TextSimilarity.API.Common.ResultSettings;
+using TextSimilarity.API.Common.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,18 +24,15 @@ builder.Services.AddCors(options =>
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddMappingConfiguration();
 
+builder.Services.AddMvc(c =>
+        c.Conventions.Add(new ApiExplorerTextSimilarityControllerOnlyConvention())
+    );
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = @"",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
+
     c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
     {
         Description = @"",
@@ -42,20 +40,6 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
         Scheme = "ApiKey"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] { }
-        }
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
