@@ -28,30 +28,30 @@ namespace TextSimilarity.API.Features.Account
         }
 
         [HttpPost(nameof(GenerateAPIKey))]
-        public async Task<ActionResult> GenerateAPIKey()
+        public async Task<ActionResult> GenerateAPIKey(CancellationToken cancellationToken)
         {
-            var result = await Mediator.Send(new GenerateAPIKeyRequest());
+            var result = await Mediator.Send(new GenerateAPIKeyRequest(), cancellationToken);
             return result.ToActionResult();
         }
 
         [HttpPost(nameof(RevokeAPIKey))]
-        public async Task<ActionResult> RevokeAPIKey()
+        public async Task<ActionResult> RevokeAPIKey(CancellationToken cancellationToken)
         {
-            var result = await Mediator.Send(new RevokeAPIKeyRequest());
+            var result = await Mediator.Send(new RevokeAPIKeyRequest(), cancellationToken);
             return result.ToActionResult();
         }
 
         [HttpGet(nameof(GetAPIKey))]
-        public async Task<ActionResult> GetAPIKey()
+        public async Task<ActionResult> GetAPIKey(CancellationToken cancellationToken)
         {
-            var result = await Mediator.Send(new GetAPIKeyRequest());
+            var result = await Mediator.Send(new GetAPIKeyRequest(), cancellationToken);
             return result.ToActionResult();
         }
 
         [HttpPost(nameof(GetAPIHistory))]
-        public async Task<ActionResult> GetAPIHistory(int start, int size, [FromBody] ColumnSort[]? sort)
+        public async Task<ActionResult> GetAPIHistory(int start, int size, [FromBody] ColumnSort[]? sort, CancellationToken cancellationToken)
         {
-            var result = await Mediator.Send(new GetAPIHistoryRequest(start, size, sort));
+            var result = await Mediator.Send(new GetAPIHistoryRequest(start, size, sort), cancellationToken);
             return result.ToActionResult();
         }
     }

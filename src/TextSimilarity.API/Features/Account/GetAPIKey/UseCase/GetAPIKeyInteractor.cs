@@ -21,7 +21,7 @@ namespace TextSimilarity.API.Features.Account.GetAPIKey.UseCase
         {
             var userInfo = _currentUserService.GetCurrentUser();
 
-            var apiKey = await _repository.GetAPIKeyAsync(userInfo.UserId);
+            var apiKey = await _repository.GetAPIKeyAsync(userInfo.UserId, cancellationToken);
 
             if (apiKey == null)
                 return Result.Fail(GetAPIKeyErrors.APIKeyNotFound());

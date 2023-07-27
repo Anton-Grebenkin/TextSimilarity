@@ -41,7 +41,7 @@ namespace TextSimilarity.API.Features.Account.GetAPIHistory.Repository
                 .ToListAsync(cancellationToken);
 
             var rowCount = await query
-                .CountAsync();
+                .CountAsync(cancellationToken);
 
             return (items, rowCount);
         }
