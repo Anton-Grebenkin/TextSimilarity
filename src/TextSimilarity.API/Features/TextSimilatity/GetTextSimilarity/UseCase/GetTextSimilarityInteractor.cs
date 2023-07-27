@@ -1,6 +1,7 @@
 ﻿using FluentResults;
 using FluentValidation;
 using MediatR;
+using System.Threading;
 using TextSimilarity.API.Common.Security.Authorization;
 
 namespace TextSimilarity.API.Features.TextSimilatity.GetTextSimilarity.UseCase
@@ -29,7 +30,7 @@ namespace TextSimilarity.API.Features.TextSimilatity.GetTextSimilarity.UseCase
             {
                 return await Task.Factory.StartNew(() =>
                 {
-                    var result = (maxLength - GetEditDistance(request.Text1, request.Text1)) / maxLength;
+                    var result = (maxLength - GetEditDistance(request.Text1, request.Text1, cancellationToken)) / maxLength;
                     return Result.Ok(new GetTextSimilarityResponse(result));
                     
                 }, cancellationToken);
@@ -38,7 +39,7 @@ namespace TextSimilarity.API.Features.TextSimilatity.GetTextSimilarity.UseCase
             return Result.Ok(new GetTextSimilarityResponse(1.0));
         }
 
-        private int GetEditDistance(string x, string y)
+        private int GetEditDistance(string x, string y, CancellationToken cancellationToken)
         {
             int m = x.Length;
             int n = y.Length;
@@ -63,6 +64,7 @@ namespace TextSimilarity.API.Features.TextSimilatity.GetTextSimilarity.UseCase
             {
                 for (int j = 1; j <= n; j++)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     cost = x[i - 1] == y[j - 1] ? 0 : 1;
                     T[i][j] = Math.Min(Math.Min(T[i - 1][j] + 1, T[i][j - 1] + 1),
                             T[i - 1][j - 1] + cost);
