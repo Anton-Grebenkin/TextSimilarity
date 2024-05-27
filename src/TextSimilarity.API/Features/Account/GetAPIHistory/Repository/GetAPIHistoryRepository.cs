@@ -28,17 +28,6 @@ namespace TextSimilarity.API.Features.Account.GetAPIHistory.Repository
                 .AsNoTracking()
                 .Where(r => r.UserId == userId && r.RequestSource == RequestSourse.API.ToString());
 
-            var q = query
-                .ApplyFilter(queryFilter)
-                .Select(r => new APIHistoryItem
-                {
-                    Duration = r.Duration,
-                    Request = r.Request,
-                    RequestDate = r.RequestDate,
-                    Response = r.Response,
-                    ResponseCode = r.ResponseCode
-                }).ToQueryString();
-
             var items = await query
                 .ApplyFilter(queryFilter)
                 .Select(r => new APIHistoryItem
