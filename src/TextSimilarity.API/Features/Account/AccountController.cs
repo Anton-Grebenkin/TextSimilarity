@@ -1,5 +1,6 @@
 ﻿using FluentResults.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
+using QueryFilter.Models;
 using TextSimilarity.API.Common.Abstractions;
 using TextSimilarity.API.Common.DataAccess;
 using TextSimilarity.API.Features.Account.GenerateAPIKey.UseCase;
@@ -49,9 +50,9 @@ namespace TextSimilarity.API.Features.Account
         }
 
         [HttpPost(nameof(GetAPIHistory))]
-        public async Task<ActionResult> GetAPIHistory(int start, int size, [FromBody] ColumnSort[]? sort, CancellationToken cancellationToken)
+        public async Task<ActionResult> GetAPIHistory(Filter queryFilter, CancellationToken cancellationToken)
         {
-            var result = await Mediator.Send(new GetAPIHistoryRequest(start, size, sort), cancellationToken);
+            var result = await Mediator.Send(new GetAPIHistoryRequest(queryFilter), cancellationToken);
             return result.ToActionResult();
         }
     }

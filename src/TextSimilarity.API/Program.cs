@@ -24,9 +24,9 @@ builder.Services.AddCors(options =>
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddMappingConfiguration();
 
-builder.Services.AddMvc(c =>
-        c.Conventions.Add(new ApiExplorerTextSimilarityControllerOnlyConvention())
-    );
+//builder.Services.AddMvc(c =>
+//        c.Conventions.Add(new ApiExplorerTextSimilarityControllerOnlyConvention())
+//    );
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -55,6 +55,7 @@ builder.Services.AddSwaggerGen(c =>
             new string[] { }
         }
     });
+    c.SchemaFilter<QueryFilterSchemaFilter>();
 });
 
 var app = builder.Build();

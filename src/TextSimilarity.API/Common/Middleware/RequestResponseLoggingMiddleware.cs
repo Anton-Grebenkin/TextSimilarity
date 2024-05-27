@@ -61,8 +61,6 @@ namespace TextSimilarity.API.Common.Middleware
             });
 
             await dbContext.SaveChangesAsync();
-          
-            await dbContext.SaveChangesAsync();
 
             await context.Response.Body.CopyToAsync(originalBodyStream);
         }

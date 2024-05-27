@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
+using QueryFilter.Models;
 using TextSimilarity.API.Common.DataAccess;
 using TextSimilarity.API.Common.Security.Authorization;
 using TextSimilarity.API.Features.Account.GetAPIHistory.DTO;
@@ -8,7 +9,7 @@ using TextSimilarity.API.Features.Account.GetAPIHistory.Repository;
 namespace TextSimilarity.API.Features.Account.GetAPIHistory.UseCase
 {
     [Authorize(RequestSourse.UI)]
-    public record GetAPIHistoryRequest(int Start, int Size, ColumnSort[] Sorts) : IRequest<Result<GetAPIHistoryResponse>>;
+    public record GetAPIHistoryRequest(Filter queryFilter) : IRequest<Result<GetAPIHistoryResponse>>;
     public record GetAPIHistoryResponse(IEnumerable<APIHistoryItem> items, int RowCount);
     public class GetAPIHistoryInteractor : IRequestHandler<GetAPIHistoryRequest, Result<GetAPIHistoryResponse>>
     {
@@ -23,7 +24,7 @@ namespace TextSimilarity.API.Features.Account.GetAPIHistory.UseCase
         {
             var userInfo = _currentUserService.GetCurrentUser();
 
-            var histoty = await _repository.GetAPIHistoryAsync(userInfo.UserId, request.Start, request.Size, request.Sorts, cancellationToken);
+            var histoty = await _repository.GetAPIHistoryAsync(userInfo!.UserId, request.queryFilter, cancellationToken);
 
             return Result.Ok(new GetAPIHistoryResponse(histoty.items, histoty.rowCount));
         }

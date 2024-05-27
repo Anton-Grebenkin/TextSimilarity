@@ -1,14 +1,23 @@
 
 import { useMemo, useState } from "react";
-import ErrorPage from "../../../common/components/ErrorPage";
 import FullScreenLoader from "../../../common/components/FullScreenLoader";
 import { useAppSelector } from "../../../common/store";
 import { isApiError } from "../../../common/utils/apiErrorHelper";
-import MaterialReactTable, { MRT_PaginationState, type MRT_ColumnDef, MRT_SortingState } from 'material-react-table';
+//import MaterialReactTable, { MRT_PaginationState, type MRT_ColumnDef, MRT_SortingState, useMaterialReactTable } from 'material-react-table';
+import {
+  MRT_ColumnFilterFnsState,
+  MRT_ColumnFiltersState,
+  MRT_PaginationState,
+  MRT_SortingState,
+  MaterialReactTable,
+  useMaterialReactTable,
+  type MRT_ColumnDef,
+} from 'material-react-table';
 import { useGenerateAPIKeyMutation, useGetAPIHistoryQuery, useGetAPIKeyQuery, useRevokeAPIKeyMutation } from "../accountApi";
-import { IHistotyItem } from "../types";
+import { IHistoryItem } from "../types";
 import { format } from 'date-fns'
 import { Navigate } from "react-router";
+import { MapFilters, MapSorts } from "../../../common/utils/filterHelper";
 
 
 export default function DashboarPage() {
@@ -18,8 +27,17 @@ export default function DashboarPage() {
     pageSize: 10,
   });
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([]);
+  const [columnFilterFns, setColumnFilterFns] = useState<MRT_ColumnFilterFnsState>({});
   const { data: apiKeyResponse, isLoading: getAPIKeyIsLoading, isSuccess: getAPIKeyIsSuccess, error: getAPIKeyError, isError: getAPIKeyIsError } = useGetAPIKeyQuery();
-  const { data: apiHistoryResponse, isLoading: getAPIHistoryIsLoading, isFetching: getAPIHistoryIsFetching, isSuccess: getAPIHistoryIsSuccess, error: getAPIHistoryError, isError: getAPIHistoryIsError } = useGetAPIHistoryQuery({ start: pagination.pageIndex * pagination.pageSize, size: pagination.pageSize, sort: JSON.stringify(sorting ?? []) });
+  const { 
+    data: apiHistoryResponse, 
+    isLoading: getAPIHistoryIsLoading, 
+    isFetching: getAPIHistoryIsFetching, 
+    isSuccess: getAPIHistoryIsSuccess, 
+    error: getAPIHistoryError, 
+    isError: getAPIHistoryIsError 
+  } = useGetAPIHistoryQuery({ skip: pagination.pageIndex * pagination.pageSize, take: pagination.pageSize, sorts: MapSorts(sorting), mainNode: MapFilters(columnFilters, columnFilterFns) });
   const [generateAPIKey, { isLoading: generateAPIKeyIsLoading, isSuccess: generateAPIKeyIsSuccess, error: generateAPIKeyError, isError: generateAPIKeyIsError }] = useGenerateAPIKeyMutation();
   const [revokeAPIKey, { isLoading: revokeAPIKeyIsLoading, isSuccess: revokeAPIKeyIsSuccess, error: revokeAPIKeyError, isError: revokeAPIKeyIsError }] = useRevokeAPIKeyMutation();
   const showGenerateAPIKeyButton = () => {
@@ -35,32 +53,70 @@ export default function DashboarPage() {
     await revokeAPIKey();
   }
 
-  const columns = useMemo<MRT_ColumnDef<IHistotyItem>[]>(
+  const columns = useMemo<MRT_ColumnDef<IHistoryItem>[]>(
     () => [
       {
         accessorKey: 'requestDate', //access nested data with dot notation
         header: 'requestDate',
-        Cell: ({ cell }) => format(new Date(cell.getValue<Date>()), 'dd.MM.yyyy HH:mm:ss')
+        Cell: ({ cell }) => format(new Date(cell.getValue<Date>()), 'dd.MM.yyyy HH:mm:ss'),
+        columnFilterModeOptions: ['lessThan', 'greaterThan', 'equals', 'notEquals'],
+        enableColumnFilterModes: true,
+        filterFn: 'equals'
       },
       {
         accessorKey: 'duration',
         header: 'duration',
+        columnFilterModeOptions: ['lessThan', 'greaterThan', 'equals', 'notEquals'],
+        enableColumnFilterModes: true,
+        filterFn: 'equals'
       },
       {
         accessorKey: 'request', //normal accessorKey
         header: 'request',
+        columnFilterModeOptions: ['contains'],
+        enableColumnFilterModes: true,
+        filterFn: 'contains'
       },
       {
         accessorKey: 'response',
         header: 'response',
+        columnFilterModeOptions: ['contains'],
+        enableColumnFilterModes: true,
+        filterFn: 'contains'
       },
       {
         accessorKey: 'responseCode',
         header: 'responseCode',
+        columnFilterModeOptions: ['lessThan', 'greaterThan', 'equals', 'notEquals'],
+        enableColumnFilterModes: true,
+        filterFn: 'equals'
       },
     ],
     [],
   );
+
+  const table = useMaterialReactTable({
+    columns,
+    manualFiltering: true,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnFilterFnsChange: setColumnFilterFns,
+    manualSorting: true,
+    manualPagination: true,
+    data: apiHistoryResponse?.items && getAPIHistoryIsSuccess ? apiHistoryResponse?.items : [],
+    rowCount: apiHistoryResponse?.rowCount,
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting,
+    state: {
+      columnFilterFns,
+      columnFilters, 
+      pagination,
+      sorting,
+      isLoading: getAPIHistoryIsLoading,
+      showProgressBars: getAPIHistoryIsFetching
+    },
+    enableColumnFilterModes: true, //enable changing filter mode for all columns unless explicitly disabled in a column def
+    initialState: { showColumnFilters: true } //show filters by default
+  });
 
   if (getAPIKeyIsLoading || generateAPIKeyIsLoading || revokeAPIKeyIsLoading) {
     return <FullScreenLoader />
@@ -94,20 +150,7 @@ export default function DashboarPage() {
         </div>
         <div>
           <p className="text-lg mt-4 mb-4 md:text-left text-center">Your API history:</p>
-          <MaterialReactTable
-            columns={columns}
-            data={apiHistoryResponse?.items && getAPIHistoryIsSuccess ? apiHistoryResponse?.items : []}
-            manualPagination
-            onPaginationChange={setPagination}
-            onSortingChange={setSorting}
-            rowCount={apiHistoryResponse?.rowCount}
-            state={{
-              pagination,
-              sorting,
-              isLoading: getAPIHistoryIsLoading,
-              showProgressBars: getAPIHistoryIsFetching
-            }}
-          />
+          <MaterialReactTable table={table}/>
         </div>
       </div>
     </div>

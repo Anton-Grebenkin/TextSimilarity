@@ -12,7 +12,7 @@ export interface IGetAPIKeyResponse {
     apiKey: string
 }
 
-export interface IHistotyItem{
+export interface IHistoryItem{
     requestDate: Date
     duration: number
     request: string
@@ -20,6 +20,6 @@ export interface IHistotyItem{
     responseCode: number
 }
 export interface IGetAPIHistoryResponse {
-    items: IHistotyItem[]
+    items: IHistoryItem[]
     rowCount: number
 }
